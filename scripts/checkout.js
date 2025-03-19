@@ -1,9 +1,8 @@
 import {cart,clearCart} from '../data/cart.js';
 import { convertToDollars } from './utils/money.js';
+import {removeProductFromCart} from '../data/cart.js';
 
-const orderSummaryDivElem=document.querySelector('.order-summary');
-
-
+const cartSummaryDivElem=document.querySelector('.cart-summary');
 
 function checkoutItemsRenderer(product){
   let todaysDate=new Date();
@@ -19,7 +18,7 @@ function checkoutItemsRenderer(product){
   console.log(earlyDeliveryDate);
   console.log(superEarlyDeliveryDate);
   
-    let HTMLforproducts=`<div class="cart-item-container">
+    let HTMLforproducts=`<div class="cart-item-container P${product.id}">
             <div class="delivery-date">
               ${lateDeliveryDate.toDateString()}
             </div>
@@ -39,11 +38,11 @@ function checkoutItemsRenderer(product){
                   <span>
                     Quantity: <span class="quantity-label">${product.quantity}</span>
                   </span>
-                  <span class="update-quantity-link link-primary">
-                    updateLink
+                  <span class="update-quantity-link link-primary js-update-link" data-product-id="${product.id}">
+                    Update
                   </span>
-                  <span class="delete-quantity-link link-primary">
-                    deleteLink
+                  <span class="delete-quantity-link link-primary js-delete-link" data-product-id="${product.id}">
+                    Delete
                   </span>
                 </div>
               </div>
@@ -95,18 +94,30 @@ function checkoutItemsRenderer(product){
             </div>
           </div>`;
 
-    orderSummaryDivElem.innerHTML+=HTMLforproducts;
+    cartSummaryDivElem.innerHTML+=HTMLforproducts;
 }
 
-cart.forEach((product)=>{
-  console.log('rendering : '+product.name);
-  checkoutItemsRenderer(product);
-})
+function renderEachProductInCart(){
+  if(cart.length===0){
+    // alert('cart is empty');
+    console.log('Cart is empty');
+    cartSummaryDivElem.innerHTML=`Your Cart Is Empty<br>
+    <a class="button-primary view-products-link" href="amazon.html" data-testid="view-products-link">
+        View products
+      </a>`
+      return;
+  }
+  cart.forEach((product)=>{
+    console.log('rendering : '+product.name);
+    checkoutItemsRenderer(product);
+  })
+}
+
+renderEachProductInCart();
 
 console.log('cart now : '+JSON.stringify(cart));
 
-
-function orderSummaryRenderer(){
+function parymentSummaryRenderer(){
     let orderSummaryHTML=`<div class="payment-summary-title">
             Order Summary
           </div>
@@ -140,3 +151,51 @@ function orderSummaryRenderer(){
             Place your order
           </button>`;
 }
+
+function removeAndRenderProductsInCart(productId){
+  cartSummaryDivElem.innerHTML='';
+  alert('cleared innerHTML');
+  for(let i=0;i<cart.length;i++){
+    if(cart[i].id===productId){
+      cart.splice(i,1);
+      i--;
+      continue;
+    }
+    checkoutItemsRenderer(cart[i]);
+  }
+  addEventListenerToProductsInCart();
+  localStorage.setItem('cart',JSON.stringify(cart));
+}
+
+function deleteParticulrProductFromCart(productId){
+  let method=2;
+  if(method===1){
+    removeProductFromCart(productId);
+
+    console.log('cart now : '+JSON.stringify(cart));
+  
+    cartSummaryDivElem.innerHTML=``; //resetting the HTML to ''
+    renderEachProductInCart();
+    addEventListenerToProductsInCart();
+    localStorage.setItem('cart',JSON.stringify(cart));
+  } else if(method===2){
+    console.log('inside method2');
+    removeAndRenderProductsInCart(productId);
+    console.log('work done');
+  }
+
+}
+
+function addEventListenerToProductsInCart(){
+  const allDeleteLinksElem=document.querySelectorAll('.js-delete-link');
+  allDeleteLinksElem.forEach((deleteLinkElem)=>{
+    deleteLinkElem.addEventListener('click',(event)=>{
+      const deleteLinkSpanElem=event.target.closest('.js-delete-link');
+      console.log('productId = '+deleteLinkSpanElem.dataset.productId);
+      deleteParticulrProductFromCart(deleteLinkSpanElem.dataset.productId);
+    })
+  });
+  
+}
+
+addEventListenerToProductsInCart();

@@ -39,9 +39,18 @@ export function addToCart(productId,quantity,name,priceCents,image){
     
 }
   
-
 export function clearCart(){
   cart=[];
   localStorage.setItem('cart',JSON.stringify(cart));
   console.log('cart resetted');
+}
+
+export function removeProductFromCart(productId){
+ for(let i=0;i<cart.length;i++){
+    if(cart[i].id==productId){
+      console.log('deleted from cart');
+      cart.splice(i,1);
+      return;
+    }
+  }
 }
