@@ -17,7 +17,6 @@ resetCartBtnElement.addEventListener('click',()=>{
 //         count : 87
 //     },
 //     priceCents   : 1090
-
 // },
 // {
 //     name : "Intermediate Size Basketball",
@@ -118,7 +117,7 @@ addToCartReqAllElem.forEach((addToCartReqElem)=>{
       console.log(event.target.dataset.productId);
 
       const productContainerElem=event.target.closest('.product-container');
-      
+    
       const quantityElem=productContainerElem.querySelector('select');
       const nameElem=productContainerElem.querySelector('.product-name');
       const imageURLElem=productContainerElem.querySelector('.product-image');
